@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using BreakInfinity;
+using System;
 using static BreakInfinity.BigDouble;
 
 public class IdleTutorialGame : MonoBehaviour
@@ -13,12 +14,12 @@ public class IdleTutorialGame : MonoBehaviour
     public Text clickValueText;
     
     //Main Currency Value
-    public double coins;
-    public double coinsPerSec;
-    public double coinsClickValue;
+    public BigDouble coins;
+    public BigDouble coinsPerSec;
+    public BigDouble coinsClickValue;
 
     //Click Upgrade 1 
-    public int clickUpgrade1Level;
+    public BigDouble clickUpgrade1Level;
     public Text clickUpgrade1Text;
 
     //Click Upgrade 1 Buy Max
@@ -34,46 +35,70 @@ public class IdleTutorialGame : MonoBehaviour
     public Text productionUpgrade2MaxText;
 
     //Production Upgrade 1
-    public int productionUpgrade1Level;
+    public BigDouble productionUpgrade1Level;
     public Text productionUpgrade1Text;
     
     //Production Upgrade 2
-    public int productionUpgrade2Level;
-    public double productionUpgrade2Power;
+    public BigDouble productionUpgrade2Level;
+    public BigDouble productionUpgrade2Power;
     public Text productionUpgrade2Text;
 
     //Click Upgrade 2
-    public int clickUpgrade2Level;
+    public BigDouble clickUpgrade2Level;
     public Text clickUpgrade2Text;
 
     //Prestige Stuff
     public Text gemsText;
     public Text gemBoostText;
     public Text gemsToGetText;
-    public double gems;
-    public double gemBoost;
-    public double gemsToGet;
+    public BigDouble gems;
+    public BigDouble gemBoost;
+    public BigDouble gemsToGet;
+
+    //E11
+    public CanvasGroup mainMenuGroup;
+    public CanvasGroup upgradeGroup;
+    public int tabSwitcher;
    
     public Image clickUpgradeBar;
 
     public void Start()
     {
         Application.targetFrameRate = 60;
+        
+        CanvasGroupChanger(true, mainMenuGroup);
+        CanvasGroupChanger(false, upgradeGroup);
+        tabSwitcher = 0;
+
         Load();
+    }
+
+    public void CanvasGroupChanger(bool x, CanvasGroup y)
+    {
+        if (x)
+        {
+            y.alpha = 1;
+            y.interactable = true;
+            y.blocksRaycasts = true;
+            return;
+        }
+        y.alpha = 0;
+        y.interactable = false;
+        y.blocksRaycasts = false;
     }
 
     public void Load()
     {
-        coins = double.Parse(PlayerPrefs.GetString("coins","0"));
-        coinsClickValue = double.Parse(PlayerPrefs.GetString("coinsClickValue","1"));
-        productionUpgrade2Power = double.Parse(PlayerPrefs.GetString("productionUpgrade2Power","5"));
+        coins = Parse(PlayerPrefs.GetString("coins","0"));
+        coinsClickValue = Parse(PlayerPrefs.GetString("coinsClickValue","1"));
+        productionUpgrade2Power = Parse(PlayerPrefs.GetString("productionUpgrade2Power","5"));
 
-        gems = double.Parse(PlayerPrefs.GetString("gems","0"));
+        gems = Parse(PlayerPrefs.GetString("gems","0"));
 
-        productionUpgrade1Level = PlayerPrefs.GetInt("productionUpgrade1Level", 0);
-        productionUpgrade2Level = PlayerPrefs.GetInt("productionUpgrade2Level", 0);
-        clickUpgrade1Level = PlayerPrefs.GetInt("clickUpgrade1Level", 0);
-        clickUpgrade2Level = PlayerPrefs.GetInt("clickUpgrade2Level", 0);
+        productionUpgrade1Level = Parse(PlayerPrefs.GetString("productionUpgrade1Level", "0"));
+        productionUpgrade2Level = Parse(PlayerPrefs.GetString("productionUpgrade2Level", "0"));
+        clickUpgrade1Level = Parse(PlayerPrefs.GetString("clickUpgrade1Level",  "0"));
+        clickUpgrade2Level = Parse(PlayerPrefs.GetString("clickUpgrade2Level",  "0"));
     }
 
     public void Save()
@@ -84,20 +109,20 @@ public class IdleTutorialGame : MonoBehaviour
 
         PlayerPrefs.SetString("gems", gems.ToString());
 
-        PlayerPrefs.SetInt("productionUpgrade1Level", productionUpgrade1Level);
-        PlayerPrefs.SetInt("productionUpgrade2Level", productionUpgrade2Level);
-        PlayerPrefs.SetInt("clickUpgrade1Level", clickUpgrade1Level);
-        PlayerPrefs.SetInt("clickUpgrade2Level", clickUpgrade2Level);
+        PlayerPrefs.SetString("productionUpgrade1Level", productionUpgrade1Level.ToString());
+        PlayerPrefs.SetString("productionUpgrade2Level", productionUpgrade2Level.ToString());
+        PlayerPrefs.SetString("clickUpgrade1Level", clickUpgrade1Level.ToString());
+        PlayerPrefs.SetString("clickUpgrade2Level", clickUpgrade2Level.ToString());
     }
 
     public void Update()
     {
         //The Higer the > 1e15 is the longer it takes to earn peels
-        gemsToGet = 150 * System.Math.Sqrt(coins / 1e7);
+        gemsToGet = 150 * Sqrt(coins / 1e7);
         gemBoost = gems * 0.05 + 1;
 
-        gemsToGetText.text = "Prestige:\n+" + System.Math.Floor(gemsToGet).ToString("F0") + " Gems";
-        gemsText.text = "Gems :" + System.Math.Floor(gems).ToString("F0");
+        gemsToGetText.text = "Prestige:\n+" + Floor(gemsToGet).ToString("F0") + " Gems";
+        gemsText.text = "Gems :" + Floor(gems).ToString("F0");
         gemBoostText.text = gemBoost.ToString("F2") + "x boost";
         
         coinsPerSec = (productionUpgrade1Level + (productionUpgrade2Power * productionUpgrade2Level)) * gemBoost;
@@ -109,14 +134,14 @@ public class IdleTutorialGame : MonoBehaviour
         //Click Upgrade Exponant Starts
 
         string clickUpgrade1CostString;
-        var clickUpgrade1Cost = 10 * System.Math.Pow(1.07, clickUpgrade1Level);
+        var clickUpgrade1Cost = 10 * Pow(1.07, clickUpgrade1Level);
         clickUpgrade1CostString = NotationMethod(clickUpgrade1Cost, "F0");
         
         string clickUpgrade1LevelString;
         clickUpgrade1LevelString = NotationMethod(clickUpgrade1Level, "F0");
 
         string clickUpgrade2CostString;
-        var clickUpgrade2Cost = 25 * System.Math.Pow(1.07, clickUpgrade2Level);
+        var clickUpgrade2Cost = 25 * Pow(1.07, clickUpgrade2Level);
         clickUpgrade2CostString = NotationMethod(clickUpgrade2Cost, "F0");
         
         string clickUpgrade2LevelString;
@@ -134,11 +159,11 @@ public class IdleTutorialGame : MonoBehaviour
         //Production Upgrade Exponant Starts
 
         string productionUpgrade1CostString;
-        var productionUpgrade1Cost = 25 * System.Math.Pow(1.07, productionUpgrade1Level);
+        var productionUpgrade1Cost = 25 * Pow(1.07, productionUpgrade1Level);
         if (productionUpgrade1Cost > 1000)
         {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade1Cost))));
-            var mantissa = (productionUpgrade1Cost / System.Math.Pow(10, exponent));
+            var exponent = (Floor(Log10(Abs(productionUpgrade1Cost))));
+            var mantissa = (productionUpgrade1Cost / Pow(10, exponent));
             productionUpgrade1CostString = mantissa.ToString("F2") + "e" + exponent;
         }
         else
@@ -149,8 +174,8 @@ public class IdleTutorialGame : MonoBehaviour
         string productionUpgrade1LevelString;
         if (productionUpgrade1Level > 1000)
         {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade1Level))));
-            var mantissa = (productionUpgrade1Level / System.Math.Pow(10, exponent));
+            var exponent = (Floor(Log10(Abs(productionUpgrade1Level))));
+            var mantissa = (productionUpgrade1Level / Pow(10, exponent));
             productionUpgrade1LevelString = mantissa.ToString("F2") + "e" + exponent;
         }
         else
@@ -159,11 +184,11 @@ public class IdleTutorialGame : MonoBehaviour
         }
 
         string productionUpgrade2CostString;
-        var productionUpgrade2Cost = 250 * System.Math.Pow(1.07, productionUpgrade2Level);
+        var productionUpgrade2Cost = 250 * Pow(1.07, productionUpgrade2Level);
         if (productionUpgrade2Cost > 1000)
         {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade2Cost))));
-            var mantissa = (productionUpgrade2Cost / System.Math.Pow(10, exponent));
+            var exponent = (Floor(Log10(Abs(productionUpgrade2Cost))));
+            var mantissa = (productionUpgrade2Cost / Pow(10, exponent));
             productionUpgrade2CostString = mantissa.ToString("F2") + "e" + exponent;
         }
         else
@@ -174,8 +199,8 @@ public class IdleTutorialGame : MonoBehaviour
         string productionUpgrade2LevelString;
         if (productionUpgrade2Level > 1000)
         {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade2Level))));
-            var mantissa = (productionUpgrade2Level / System.Math.Pow(10, exponent));
+            var exponent = (Floor(Log10(Abs(productionUpgrade2Level))));
+            var mantissa = (productionUpgrade2Level / Pow(10, exponent));
             productionUpgrade2LevelString = mantissa.ToString("F2") + "e" + exponent;
         }
         else
@@ -196,38 +221,18 @@ public class IdleTutorialGame : MonoBehaviour
         Save();
     }
 
-    public string NotationMethod(double x, string y)
+    public string NotationMethod(BigDouble x, string y)
     {
         if (x > 1000)
         {
-            var exponent = System.Math.Floor(System.Math.Log10(System.Math.Abs(x)));
-            var mantissa = x / System.Math.Pow(10, exponent);
+            var exponent = Floor(Log10(Abs(x)));
+            var mantissa = x / Pow(10, exponent);
             return mantissa.ToString("F2") + "e" + exponent;
         }
         return x.ToString(y);
     }
 
-    public string NotationMethod(float x, string y)
-    {
-        if (x > 1000)
-        {
-            var exponent = Mathf.Floor(Mathf.Log10(Mathf.Abs(x)));
-            var mantissa = x / Mathf.Pow(10, exponent);
-            return mantissa.ToString("F2") + "e" + exponent;
-        }
-        return x.ToString(y);
-    }
-
-    public string NotationMethod(int x, string y)
-    {
-        if (x > 1000)
-        {
-            var exponent = System.Math.Floor(System.Math.Log10(System.Math.Abs(x)));
-            var mantissa = x / System.Math.Pow(10, exponent);
-            return mantissa.ToString("F2") + "e" + exponent;
-        }
-        return x.ToString(y);
-    }
+    
     
     // Prestige
     public void Prestige()
@@ -255,12 +260,12 @@ public class IdleTutorialGame : MonoBehaviour
     {
         
         //p means production
-        var pcost = 25 * System.Math.Pow(1.07, productionUpgrade1Level);
-        var pcost2 = 250 * System.Math.Pow(1.07, productionUpgrade2Level);
+        var pcost = 25 * Pow(1.07, productionUpgrade1Level);
+        var pcost2 = 250 * Pow(1.07, productionUpgrade2Level);
             
         //normal cost is the click upgrade costs
-        var cost1 = 10 * System.Math.Pow(1.07, clickUpgrade1Level);
-        var cost2 = 25 * System.Math.Pow(1.07, clickUpgrade2Level);
+        var cost1 = 10 * Pow(1.07, clickUpgrade1Level);
+        var cost2 = 25 * Pow(1.07, clickUpgrade2Level);
         
         switch (upgradeID)
         {
@@ -312,25 +317,25 @@ public class IdleTutorialGame : MonoBehaviour
         var c = coins;
         var r = 1.07;
         var k = clickUpgrade1Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
 
-        var cost = b * (System.Math.Pow(r, k) + (System.Math.Pow(r, n) - 1) / (r - 1));
+        var cost = b * (Pow(r, k) + (Pow(r, n) - 1) / (r - 1));
 
         if(coins >= cost)
         {
-            clickUpgrade1Level += (int)n;
+            clickUpgrade1Level += n;
             coins -= cost;
             coinsClickValue += n;
         }                
     }
 
-    double BuyClickUpgrade1MaxCount()
+    public BigDouble BuyClickUpgrade1MaxCount()
     {
         var b = 10;
         var c = coins;
         var r = 1.07;
         var k = clickUpgrade1Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
         return n;
     }
 
@@ -341,25 +346,25 @@ public class IdleTutorialGame : MonoBehaviour
         var c = coins;
         var r = 1.07;
         var k = clickUpgrade2Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
 
-        var cost = b * (System.Math.Pow(r, k) + (System.Math.Pow(r, n) - 1) / (r - 1));
+        var cost = b * (Pow(r, k) + (Pow(r, n) - 1) / (r - 1));
 
         if(coins >= cost)
         {
-            clickUpgrade2Level += (int)n;
+            clickUpgrade2Level += n;
             coins -= cost;
             coinsClickValue += n;
         }                
     }
 
-    double BuyClickUpgrade2MaxCount()
+    public BigDouble BuyClickUpgrade2MaxCount()
     {
         var b = 25;
         var c = coins;
         var r = 1.07;
         var k = clickUpgrade2Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
         return n;
     }
 
@@ -371,25 +376,25 @@ public class IdleTutorialGame : MonoBehaviour
         var c = coins;
         var r = 1.07;
         var k = productionUpgrade1Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
 
-        var cost = b * (System.Math.Pow(r, k) + (System.Math.Pow(r, n) - 1) / (r - 1));
+        var cost = b * (Pow(r, k) + (Pow(r, n) - 1) / (r - 1));
 
         if(coins >= cost)
         {
-            productionUpgrade1Level += (int)n;
+            productionUpgrade1Level += n;
             coins -= cost;
             coinsPerSec += n;
         } 
     }
 
-    double BuyProductionUpgrade1MaxCount()
+    public BigDouble BuyProductionUpgrade1MaxCount()
     {
         var b = 25;
         var c = coins;
         var r = 1.07;
         var k = productionUpgrade1Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
         return n;
     }
 
@@ -401,25 +406,54 @@ public class IdleTutorialGame : MonoBehaviour
         var c = coins;
         var r = 1.07;
         var k = productionUpgrade2Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
 
-        var cost = b * (System.Math.Pow(r, k) + (System.Math.Pow(r, n) - 1) / (r - 1));
+        var cost = b * (Pow(r, k) + (Pow(r, n) - 1) / (r - 1));
 
         if(coins >= cost)
         {
-            productionUpgrade2Level += (int)n;
+            productionUpgrade2Level += n;
             coins -= cost;
             coinsPerSec += n;
         } 
     }
 
-    double BuyProductionUpgrade2MaxCount()
+    public BigDouble BuyProductionUpgrade2MaxCount()
     {
         var b = 250;
         var c = coins;
         var r = 1.07;
         var k = productionUpgrade2Level;
-        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        var n = Floor(Log((c * (r - 1)) / (b * Pow(r,k)) + 1, r));
         return n;
+    }
+
+    public void ChangeTabs(string id)
+    {
+        switch (id)
+        {
+            case "upgrades":
+                CanvasGroupChanger(false, mainMenuGroup);
+                CanvasGroupChanger(true, upgradeGroup);
+                break;
+            case "main":
+                CanvasGroupChanger(true, mainMenuGroup);
+                CanvasGroupChanger(false, upgradeGroup);
+                break;
+        }
+    }
+
+    public void FullReset()
+    {
+        coins = 0;
+        coinsClickValue = 1;
+        productionUpgrade2Power =5;
+
+        gems = 0;
+
+        productionUpgrade1Level = 0;
+        productionUpgrade2Level = 0;
+        clickUpgrade1Level = 0;
+        clickUpgrade2Level = 0;
     }
 }
