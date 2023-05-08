@@ -13,9 +13,9 @@ public class IdleTutorialGame : MonoBehaviour
     public Text clickValueText;
     
     //Main Currency Value
-    public BigDouble coins;
-    public BigDouble coinsPerSecond;
-    public BigDouble coinsClickValue;
+    public double coins;
+    public double coinsPerSec;
+    public double coinsClickValue;
 
     //Click Upgrade 1 
     public int clickUpgrade1Level;
@@ -39,7 +39,7 @@ public class IdleTutorialGame : MonoBehaviour
     
     //Production Upgrade 2
     public int productionUpgrade2Level;
-    public BigDouble productionUpgrade2Power;
+    public double productionUpgrade2Power;
     public Text productionUpgrade2Text;
 
     //Click Upgrade 2
@@ -50,9 +50,9 @@ public class IdleTutorialGame : MonoBehaviour
     public Text gemsText;
     public Text gemBoostText;
     public Text gemsToGetText;
-    public BigDouble gems;
-    public BigDouble gemBoost;
-    public BigDouble gemsToGet;
+    public double gems;
+    public double gemBoost;
+    public double gemsToGet;
    
     public Image clickUpgradeBar;
 
@@ -359,6 +359,66 @@ public class IdleTutorialGame : MonoBehaviour
         var c = coins;
         var r = 1.07;
         var k = clickUpgrade2Level;
+        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        return n;
+    }
+
+    // Buy Production Upgrade 1 Buy Max Method Below
+    
+    public void BuyProductionUpgrade1Max()
+    {
+        var b = 25;
+        var c = coins;
+        var r = 1.07;
+        var k = productionUpgrade1Level;
+        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+
+        var cost = b * (System.Math.Pow(r, k) + (System.Math.Pow(r, n) - 1) / (r - 1));
+
+        if(coins >= cost)
+        {
+            productionUpgrade1Level += (int)n;
+            coins -= cost;
+            coinsPerSec += n;
+        } 
+    }
+
+    double BuyProductionUpgrade1MaxCount()
+    {
+        var b = 25;
+        var c = coins;
+        var r = 1.07;
+        var k = productionUpgrade1Level;
+        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+        return n;
+    }
+
+    // Buy Production Upgrade 2 Buy Max Method Below
+
+    public void BuyProductionUpgrade2Max()
+    {
+        var b = 250;
+        var c = coins;
+        var r = 1.07;
+        var k = productionUpgrade2Level;
+        var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
+
+        var cost = b * (System.Math.Pow(r, k) + (System.Math.Pow(r, n) - 1) / (r - 1));
+
+        if(coins >= cost)
+        {
+            productionUpgrade2Level += (int)n;
+            coins -= cost;
+            coinsPerSec += n;
+        } 
+    }
+
+    double BuyProductionUpgrade2MaxCount()
+    {
+        var b = 250;
+        var c = coins;
+        var r = 1.07;
+        var k = productionUpgrade2Level;
         var n = System.Math.Floor(System.Math.Log((c * (r - 1)) / (b * System.Math.Pow(r,k)) + 1, r));
         return n;
     }
